@@ -5,16 +5,16 @@ is entered, it will send “uu” instead of “w”, and if the character “m�
 send “nn” instead of “m”.
 That day TXT received a message from his friend, and he knew the message was
 wrong.
-Now please can you help TXT calculate the number of the possibilities of the original
-string s
-  //------
-    Input
-  //------
+Now please can you help TXT calculate the number of the possibilities of the original string s
+
+//-------
+1- Input
+//-------
     The input consists of a line containing a string s contains only lowercase Latin
     letters. (1 ≤ | s | ≤ 10^5)
-  //------
-    Output
-  //------
+//--------
+2- Output
+//--------
     Print an integer - the original string s number of possibilities, modulo 10^9+7.
 
 
@@ -44,33 +44,37 @@ long long combination(int n, int r) {
     return result;
 }
 
-int get_original_string_possibilities_number(string message){
-    int possibilities_array[message.size()];
+long long get_original_string_possibilities_number(string message){
+    long long possibilities_array[message.size()+1];
     possibilities_array[0] = 1;
     int n = 0, u = 0;
-    if(message[0] == 'n'){
-        n++;
-    }
-    else if(message[0] == 'u'){
-        u++;
-    }
-    for (int i = 1; i < message.size(); i++)
+    for (int i = 1; i <= message.size(); i++)
     {
-        if(message[i] == 'n'){
-            n++;
-            if(n == 0){
-            possibilities_array[i] = possibilities_array[i-1];
-            }else{
-            possibilities_array[i] = possibilities_array[i-n] *combination(n,2)  ;
-            }
+        if(message[i-1] == 'm' || message[i-1] == 'w'){
+            return 0;
         }
-        else if (message[i] == 'u'){
-            u++;
-            if(u == 0){
-            possibilities_array[i] = possibilities_array[i-1];
+        else if(message[i-1] == 'n'){
+            if(n == 0){
+                possibilities_array[i] = possibilities_array[i-1];
+            }else if(n == 1){
+                possibilities_array[i] = possibilities_array[i-n] * 2;
             }else{
-            possibilities_array[i] = possibilities_array[i-u] *combination(u,2)  ;
+                possibilities_array[i] = possibilities_array[i-n] * combination(n+1,2)  ;
             }
+            u = 0;
+            n++;
+        }
+        else if (message[i-1] == 'u'){
+            if(u == 0){
+                possibilities_array[i] = possibilities_array[i-1];
+            }else if(u == 1){
+                possibilities_array[i] = possibilities_array[i-u] * 2;
+            }
+            else{
+                possibilities_array[i] = possibilities_array[i-u] * combination(u+1,2)  ;
+            }
+            n = 0;
+            u++;
         }
         else{
             n = 0;
@@ -81,14 +85,14 @@ int get_original_string_possibilities_number(string message){
     }
     
 
-    return possibilities_array[message.size()-1];
+    return possibilities_array[message.size()] % (1000000007);
 }
 
 int main(){
     cout<<"Enter the message: ";
     string message;
     cin>>message;
-    int original_string_possibilities_number = get_original_string_possibilities_number(message);
+    long long original_string_possibilities_number = get_original_string_possibilities_number(message);
     cout<<"the number of the possibilities of the original message is: "<<original_string_possibilities_number;
 
 
