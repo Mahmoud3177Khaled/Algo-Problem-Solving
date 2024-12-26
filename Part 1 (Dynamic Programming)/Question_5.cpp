@@ -26,6 +26,13 @@ Input                   Output
 */
 #include <iostream>
 using namespace std;
+int max( int a, int b){
+    if(a > b){
+        return a;
+    }
+    return b;
+}
+
 //like longest common subsequence
 int get_longest_increasing_subsequence_length(int array[] , int array_size){
     int length_array[array_size+1][array_size];
@@ -36,10 +43,18 @@ int get_longest_increasing_subsequence_length(int array[] , int array_size){
     
     for (int i = 1; i < array_size + 1; i++)
     {
+        // for (int j = 0; j < i-1; j++)
+        // {
+        //     cout<<"  ";
+        // }
+        
         for (int j = i-1; j < array_size; j++)
         {
-            if(array[j] > array[i-1] || i-1 == j){
+            if(i-1 == j){
                 length_array[i][j] = length_array [i-1][j] + 1;
+            }
+            else if(array[j] > array[i-1]){
+                length_array[i][j] = max(length_array [i-1][j], length_array[i-1][i-1] +1);
             }
             else{
                 length_array[i][j] = length_array [i-1][j];
