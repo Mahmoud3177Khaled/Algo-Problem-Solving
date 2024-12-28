@@ -22,6 +22,7 @@ int main() {
     cin >> goldCost >> silverCost;
 
     int goldMax = 0, silverMax = 0;
+    int oldGoldMax = 0, oldSilverMax = 0;
 
     unordered_map<pair<int, int>, pair<int, int>, HashThePair> roadMap;
 
@@ -39,6 +40,9 @@ int main() {
         if(roadMap.find(roadKey) == roadMap.end()) {
             roadMap[roadKey] = roadCost;
 
+            oldGoldMax = goldMax;
+            oldSilverMax = silverMax;
+
             if(roadCost.first > goldMax) {
                 goldMax = roadCost.first;
             }
@@ -50,16 +54,20 @@ int main() {
             pair<int, int> existingRoad = roadMap[roadKey];
 
             if((existingRoad.first + existingRoad.second) > (roadCost.first + roadCost.second)) {
+
                 roadMap.erase(existingRoad);
+                roadMap[roadKey] = roadCost;
 
                 if(existingRoad.first == goldMax) {
-                    goldMax = roadCost.first;
+                    goldMax = oldGoldMax;
                 }
                 if(existingRoad.second == silverMax) {
-                    silverMax = roadCost.second;
+                    silverMax = oldSilverMax;
                 }
+                
 
-                roadMap[roadKey] = roadCost;
+                oldGoldMax = goldMax;
+                oldSilverMax = silverMax;
 
                 if(roadCost.first > goldMax) {
                     goldMax = roadCost.first;
@@ -76,11 +84,11 @@ int main() {
     
     }
     
-    // for(auto p : roadMap) {
-    //     cout << p.first.first << "->" << p.first.second << "  " << p.second.first << " " << p.second.second << endl;
-    // }
+    for(auto p : roadMap) {
+        cout << p.first.first << "->" << p.first.second << "  " << p.second.first << " " << p.second.second << endl;
+    }
 
-    cout << goldMax + silverMax << endl;
+    cout << goldMax << " " << silverMax << endl;
 
 
 }
