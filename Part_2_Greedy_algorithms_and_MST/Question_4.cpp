@@ -64,7 +64,7 @@ int main() {
                 if(existingRoad.second == silverMax) {
                     silverMax = oldSilverMax;
                 }
-                
+
 
                 oldGoldMax = goldMax;
                 oldSilverMax = silverMax;
@@ -84,11 +84,11 @@ int main() {
     
     }
     
-    for(auto p : roadMap) {
-        cout << p.first.first << "->" << p.first.second << "  " << p.second.first << " " << p.second.second << endl;
-    }
+    // for(auto p : roadMap) {
+    //     cout << p.first.first << "->" << p.first.second << "  " << p.second.first << " " << p.second.second << endl;
+    // }
 
-    cout << goldMax << " " << silverMax << endl;
+    cout << goldMax + silverMax << endl;
 
 
 }
