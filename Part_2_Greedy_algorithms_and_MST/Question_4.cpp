@@ -79,9 +79,6 @@ int main() {
             }
         }
 
-
-
-    
     }
     
     // for(auto p : roadMap) {
