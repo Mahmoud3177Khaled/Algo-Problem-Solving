@@ -4,10 +4,10 @@
 using namespace std;
 
 int main() {
-    // int t = 0;
+    int t = 0;
 
-    // cin >> t;
-    // while(t--) {
+    cin >> t;
+    while(t--) {
         int capacity = 0, numOfBags = 0;
         cin >> capacity >> numOfBags;
 
@@ -47,11 +47,7 @@ int main() {
             
         }
 
-        cout << dp[numOfBags][capacity];
-        
 
-
-
-
-    // }
+        cout << "Hey stupid robber, you can get " << dp[numOfBags][capacity] << "." << endl;
+    }
 }
