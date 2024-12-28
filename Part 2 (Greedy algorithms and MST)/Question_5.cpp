@@ -3,22 +3,22 @@
 using namespace std;
 #define INT_MAX 0x7fffffff
 
-int power(int element,int exponent) {
+long long power(long long element,int exponent) {
     if (exponent == 0) {
         return 1;
     }
     if (exponent ==1) {
         return element;
     }
-    int temp =element*element;
-    int result = power(temp,exponent/2);
+    long long temp =element*element;
+    long long result = power(temp,exponent/2);
     if (exponent %2 == 1) {
         return result*element;
     }
     return result;
 }
 
-string to_binary(int number) {
+string to_binary(long long number) {
     if (number == 0) {
         return "0";
     }
@@ -30,7 +30,7 @@ string to_binary(int number) {
     return binary;
 }
 
-int minimum_unvisited_city_length(bool is_visited[] , int* shortest_paths_length,int number_of_cities){
+int minimum_unvisited_city_length(bool is_visited[] , long long* shortest_paths_length,int number_of_cities){
     int city_length = INT_MAX;
     int city_index = -1;
     for (int i = 0; i < number_of_cities; i++)
@@ -45,9 +45,9 @@ int minimum_unvisited_city_length(bool is_visited[] , int* shortest_paths_length
     return city_index;
 }
 
-int* shortest_path_from(int **map ,int number_of_cities, int Current_city){
+long long* shortest_path_from(long long **map ,int number_of_cities, int Current_city){
     bool is_visited[number_of_cities];
-    int* shortest_paths_length = new int[number_of_cities];
+    long long* shortest_paths_length = new long long[number_of_cities];
     for (int i = 0; i < number_of_cities; i++)
     {
         shortest_paths_length[i] =INT_MAX;
@@ -72,10 +72,10 @@ int main(){
     int number_of_cities , number_of_roads;
     cin>>number_of_cities>>number_of_roads;
     int city1, city2 , length;
-    int **map = new int*[number_of_cities];
+    long long **map = new long long*[number_of_cities];
     for (int i = 0; i < number_of_cities; i++)
     {
-        map[i]= new int[number_of_cities];
+        map[i]= new long long[number_of_cities];
     }
     for (int i = 0; i < number_of_cities; i++) {
         for (int j = 0; j < number_of_cities; j++) {
@@ -93,8 +93,8 @@ int main(){
     //     }
     //     cout<<"\n";
     // }
-    int *shortest_path_from_city;
-    int sum = 0;
+    long long *shortest_path_from_city;
+    long long sum = 0;
     for (int i = number_of_cities; i > 1; i--)
     {
         shortest_path_from_city = shortest_path_from(map,i,i-1);
@@ -105,7 +105,7 @@ int main(){
         }
         // cout<<"\n";
     }
-        cout<<sum;
+        // cout<<sum<<"\n";
         cout<<to_binary(sum);
     return 0 ;
 }
