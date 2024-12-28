@@ -38,6 +38,11 @@ int main() {
         int from = 0, to = 0;
         cin >> from >> to;
 
+        // if the road leads to the same city, its useless, let the bandits have it
+        if(from == to) {
+            continue;
+        }
+
         //gold and silver gift cost of that road
         int goldCoins = 0, silverCoins = 0;
         cin >> goldCoins >> silverCoins;
