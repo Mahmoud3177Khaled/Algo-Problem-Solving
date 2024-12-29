@@ -76,16 +76,16 @@ int main() {
         int sourceCity = minVertix.first;
 
         for (int j = 1; j <= numOfCities; j++) {
-            cout << "\n";
+            // cout << "\n";
             if((proccessedVertixs.find(j) == proccessedVertixs.end())/* || proccessedVertixs.find(sourceCity) == proccessedVertixs.end()*/) { // destination vertix in adj not proccessed yet
 
-                cout << sourceCity << " " << j << endl;
-                cout << adj[sourceCity][j].first << " " << adj[sourceCity][j].second << endl;
+                // cout << sourceCity << " " << j << endl;
+                // cout << adj[sourceCity][j].first << " " << adj[sourceCity][j].second << endl;
 
-                cout << adj[sourceCity][j].first + adj[sourceCity][j].second << " " <<  unproccessedVertixs[j] << endl;
-                cout << adj[sourceCity][j].first + adj[sourceCity][j].second << " " <<  unproccessedVertixs[sourceCity] << endl;
+                // cout << adj[sourceCity][j].first + adj[sourceCity][j].second << " " <<  unproccessedVertixs[j] << endl;
+                // cout << adj[sourceCity][j].first + adj[sourceCity][j].second << " " <<  unproccessedVertixs[sourceCity] << endl;
 
-                cout << goldMax << " " << silverMax << endl;
+                // cout << goldMax << " " << silverMax << endl;
 
 
                 if((adj[sourceCity][j].first != 1000) && (adj[sourceCity][j].second != 1000)
@@ -100,7 +100,7 @@ int main() {
                     }
 
 
-                    cout << "condition hit" << endl;
+                    // cout << "condition hit" << endl;
                     if(adj[sourceCity][j].first + adj[sourceCity][j].second < unproccessedVertixs[j]) {
                         unproccessedVertixs[j] = adj[sourceCity][j].first + adj[sourceCity][j].second;
 
@@ -110,7 +110,7 @@ int main() {
                     }
 
                 }
-                    cout << "added " << minVertix.first << " to proccessed" << endl;
+                    // cout << "added " << minVertix.first << " to proccessed" << endl;
                     proccessedVertixs[minVertix.first] = 1;
                 
             }
@@ -119,14 +119,12 @@ int main() {
     }
 
     for(auto pair : unproccessedVertixs) {
-        // if (pair.second == 1000) {
-        //     cout << -1 << endl;
-        //     return 0;
-        // }
+        if (pair.second == 1000) {
+            cout << -1 << endl;
+            return 0;
+        }
 
-        cout << pair.first << " " << pair.second << endl;
-
-
+        // cout << pair.first << " " << pair.second << endl;
         
     }
     
