@@ -1,123 +1,136 @@
-#include <iostream>
-#include <unordered_map>
+#include<iostream>
+#include<queue>
+#include<map>
 
 using namespace std;
 
-struct HashThePair {
-
-    size_t operator()(const pair<int, int> p) const {
-        size_t h1 = hash<int>{}(p.first);
-        size_t h2 = hash<int>{}(p.second);
-
-        return h1 ^ (h2 << 1);
+struct CompareSecond {
+    bool operator()(pair<int, int> a, pair<int, int> b) {
+        return a.second > b.second; // min heap push, smallest first
     }
 };
 
 int main() {
+    int numOfCities = 0, numOfRoads = 0;
+    cin >> numOfCities >> numOfRoads;
 
-    //cities and roads count
-    int cityCount = 0, roadCount = 0;
-    cin >> cityCount >> roadCount;
-
-    //gold cost and silver cost in olympia money
     int goldCost = 0, silverCost = 0;
     cin >> goldCost >> silverCost;
 
-    //gold max and silver max to secure all raods with a gift containing the largest of both 
     int goldMax = 0, silverMax = 0;
-    //old maximums to restore maxs to if the road whose max gold or silver got saved was removed becasue of a better one
-    int oldGoldMax = 0, oldSilverMax = 0;
 
-    //hash map to map each road to its cost
-    unordered_map<pair<int, int>, pair<int, int>, HashThePair> roadMap;
+    priority_queue<pair<int, int>,vector<pair<int, int>>, CompareSecond> v;
+    map<int, int> proccessedVertixs;
+    map<int, int> unproccessedVertixs;
 
-    //looping on all my roads
-    while (roadCount--)
+    for (int i = 1; i <= numOfCities; i++)
     {
-        //road start and finish
+        if(i == numOfCities) {
+
+            pair<int, int> vertixPair = pair<int, int>(i, 0);
+            v.push(vertixPair);
+            unproccessedVertixs[vertixPair.first] = vertixPair.second;
+            continue;
+        }
+        pair<int, int> vertixPair = pair<int, int>(i, 1000);
+        v.push(vertixPair);
+        unproccessedVertixs[vertixPair.first] = vertixPair.second;
+    }
+
+    
+    
+
+    pair<int, int> adj[numOfCities+1][numOfCities+1];
+
+    for (int i = 1; i <= numOfCities; i++)
+    {
+        for (int j = 1; j <= numOfCities; j++)
+        {
+            adj[i][j] = pair<int, int>(1000, 1000);
+        }
+        
+    }
+
+    while (numOfRoads--)
+    {
         int from = 0, to = 0;
         cin >> from >> to;
 
-        // if the road leads to the same city, its useless, let the bandits have it
-        if(from == to) {
-            continue;
-        }
-
-        //gold and silver gift cost of that road
         int goldCoins = 0, silverCoins = 0;
         cin >> goldCoins >> silverCoins;
 
-        //create pairs to put in roads map
-        pair<int, int> roadKey = pair<int, int>(from, to);
-        pair<int, int> roadCost = pair<int, int>(goldCoins * goldCost, silverCoins * silverCost);
+        pair<int, int> newRoad = pair<int, int>(goldCoins*goldCost, silverCoins*silverCost);
 
-        // two cases: if the road connects two new cities -> add it
-        // if it doesnt -> check if the new road has cheaper gold + silver gift cost
-        //     if so -> remove the old exisiting road and add the new and update the maxs
-        //     if not -> dont add that road all togther and maxs stay the same
+        if((adj[from][to].first + adj[from][to].second) > newRoad.first + newRoad.second) {
+            adj[from][to] = newRoad;
+            adj[to][from] = newRoad;
+        }
+    }
 
-        // road desnt exist (new road)
-        if(roadMap.find(roadKey) == roadMap.end()) {
-            roadMap[roadKey] = roadCost;
+    while(!v.empty()) {
+        pair<int, int> minVertix = v.top();
+        v.pop();
 
-            oldGoldMax = goldMax;
-            oldSilverMax = silverMax;
+        int sourceCity = minVertix.first;
 
-            if(roadCost.first > goldMax) {
-                goldMax = roadCost.first;
-            }
-            if(roadCost.second > silverMax) {
-                silverMax = roadCost.second;
-            }
+        for (int j = 1; j <= numOfCities; j++) {
+            // cout << "\n";
+            if((proccessedVertixs.find(j) == proccessedVertixs.end())/* || proccessedVertixs.find(sourceCity) == proccessedVertixs.end()*/) { // destination vertix in adj not proccessed yet
 
-        //a road connnecting these two exists
-        } else {
+                // cout << sourceCity << " " << j << endl;
+                // cout << adj[sourceCity][j].first << " " << adj[sourceCity][j].second << endl;
 
-            // the old road
-            pair<int, int> existingRoad = roadMap[roadKey];
+                // cout << adj[sourceCity][j].first + adj[sourceCity][j].second << " " <<  unproccessedVertixs[j] << endl;
+                // cout << adj[sourceCity][j].first + adj[sourceCity][j].second << " " <<  unproccessedVertixs[sourceCity] << endl;
 
-            //is the new road "cheaper" than the esisting one?
-            if((existingRoad.first + existingRoad.second) > (roadCost.first + roadCost.second)) {
+                // cout << goldMax << " " << silverMax << endl;
+
+
+                if((adj[sourceCity][j].first != 1000) && (adj[sourceCity][j].second != 1000)
+                    && (adj[sourceCity][j].first + adj[sourceCity][j].second < unproccessedVertixs[j] || adj[sourceCity][j].first + adj[sourceCity][j].second < unproccessedVertixs[sourceCity])) {
+
+                    if(adj[sourceCity][j].first > goldMax) {
+                        goldMax = adj[sourceCity][j].first;
+                    }
+
+                    if(adj[sourceCity][j].second > silverMax) {
+                        silverMax = adj[sourceCity][j].second;
+                    }
+
+
+                    // cout << "condition hit" << endl;
+                    unproccessedVertixs[j] = adj[sourceCity][j].first + adj[sourceCity][j].second;
+
+                }
+                    // cout << "added " << minVertix.first << " to proccessed" << endl;
+                    proccessedVertixs[minVertix.first] = 1;
                 
-                // if yes -> remove it and add the new
-                roadMap.erase(existingRoad);
-                roadMap[roadKey] = roadCost;
-
-                // but what if the gold and silver max where based on this road?
-
-                //if the maxs where saved from this existing road that was deleted -> reset them to what was the max before they were overwritten
-                if(existingRoad.first == goldMax) {
-                    goldMax = oldGoldMax;
-                }
-                if(existingRoad.second == silverMax) {
-                    silverMax = oldSilverMax;
-                }
-
-                // save before overwriting
-                oldGoldMax = goldMax;
-                oldSilverMax = silverMax;
-
-                // update the maxs if the new road was essential and more expensive...
-                if(roadCost.first > goldMax) {
-                    goldMax = roadCost.first;
-                }
-                if(roadCost.second > silverMax) {
-                    silverMax = roadCost.second;
-                }
-
             }
         }
-
+        
     }
     
-    // for(auto p : roadMap) {
-    //     cout << p.first.first << "->" << p.first.second << "  " << p.second.first << " " << p.second.second << endl;
+    // for (int i = 1; i <= numOfCities; i++)
+    // {
+    //     for (int j = 1; j <= numOfCities; j++)
+    //     {
+    //         // adj[i][j] = pair<int, int>(1000, 1000);
+
+    //         cout << adj[i][j].first << "/" << adj[i][j].second << " ";
+    //     }
+
+    //     cout << endl;
+        
     // }
 
-    //total is the maximum gift in olypian money if gold and silver that covers at most one road between 2 cities
+    // while (!v.empty()) {
+
+    //     pair<int, int> showPair = v.top();
+    //     v.pop();
+
+    //     cout << showPair.first << " " << showPair.second << endl;
+        
+    // }
+
     cout << goldMax + silverMax << endl;
-
-    //  ######### Thank You! :) #########
-
-
 }
