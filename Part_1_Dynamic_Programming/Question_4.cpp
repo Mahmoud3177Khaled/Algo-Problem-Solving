@@ -1,54 +1,58 @@
 #include <iostream>
 #include <vector>
-
+#include <algorithm>
 using namespace std;
 
 struct Treasure {
     int depth;
-    int value;
+    int gold;
 };
 
 int main() {
-    int T, k, n;
-    cin >> T >> k >> n;
+    int t, w;
+    bool Case1 = true;
+    while (cin >> t >> w) {
+        int n;
+        cin >> n;
+        vector<Treasure> treasures(n);
+        for (int i = 0; i < n; ++i) {
+            cin >> treasures[i].depth >> treasures[i].gold;
+        }
 
-    Treasure treasures[n]; // Fixed size since n is 3
+        vector<vector<int>> dp(n + 1, vector<int>(t + 1, 0));
 
-    for (int i = 0; i < n; ++i) {
-        cin >> treasures[i].depth >> treasures[i].value;
-    }
+        for (int i = 1; i <= n; ++i) {
+            int timeRequired = 3 * w * treasures[i - 1].depth;
+            for (int j = 0; j <= t; ++j) {
+                dp[i][j] = dp[i - 1][j]; // Not taking the treasure
+                if (j >= timeRequired) {
+                    dp[i][j] = max(dp[i][j], dp[i - 1][j - timeRequired] + treasures[i - 1].gold);
+                }
+            }
+        }
 
-    int dp[T + 1];
-    for (int i = 0; i < T + 1; ++i) {
-        dp[i] = 0;
-    }
+        int maxGold = dp[n][t];
+        vector<Treasure> selected;
+        int remainingTime = t;
 
-    for (int i = 0; i < n; ++i) {
-        int time = 3 * k * treasures[i].depth;
-        for (int t = T; t >= time; --t) {
-            dp[t] = max(dp[t], dp[t - time] + treasures[i].value);
+        for (int i = n; i > 0; --i) {
+            int timeRequired = 3 * w * treasures[i - 1].depth;
+            if (remainingTime >= timeRequired && dp[i][remainingTime] == dp[i - 1][remainingTime - timeRequired] + treasures[i - 1].gold) {
+                selected.push_back(treasures[i - 1]);
+                remainingTime -= timeRequired;
+            }
+        }
+
+        if (!Case1) {
+            cout << '\n';
+        }
+        Case1 = false;
+
+        cout << maxGold << '\n';
+        cout << selected.size() << '\n';
+        for (auto it = selected.rbegin(); it != selected.rend(); ++it) {
+            cout << it->depth << " " << it->gold << '\n';
         }
     }
-
-
-    vector<Treasure> maximum;
-    int t = T;
-    for (int i = n - 1; i >= 0; --i) {
-        int timeRequired = 3 * k * treasures[i].depth;
-        if (t >= timeRequired && dp[t] == dp[t - timeRequired] + treasures[i].value) {
-            maximum.push_back(treasures[i]);
-            t -= timeRequired;
-        }
-    }
-
-    int max = dp[T];
-    cout << max << "\n";
-
-    cout << maximum.size() << "\n";
-
-    for (auto treasure: maximum) {
-        cout << treasure.depth << " " << treasure.value << "\n";
-    }
-
     return 0;
 }

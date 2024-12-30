@@ -13,7 +13,11 @@ AAABBB
 
  */
 
-int CPU_tasks(){
+
+
+
+int main () {
+
     int n;
     string s;
     cin>>n;
@@ -52,14 +56,7 @@ int CPU_tasks(){
         interval += queue.empty() ? cycle : n + 1;
     }
 
-     return interval;
-}
-
-
-int main () {
-
-    CPU_tasks();
-
+    cout<< interval;
 
 
 }
