@@ -1,155 +1,141 @@
-#include<iostream>
-#include<queue>
-#include<map>
+#include <iostream>
+#include <climits>
+#include <vector>
+#include <algorithm>
+#include <cstdio>
+#include <cctype>
 
 using namespace std;
 
-struct CompareSecond {
-    bool operator()(pair<int, int> a, pair<int, int> b) {
-        return a.second > b.second; // min heap push, smallest first
-    }
+//road
+struct Link {
+    int node1;
+    int node2;
+    int gold_cost;
+    int silver_cost;
 };
 
+// input
+int read_input() {
+    int result = 0;
+    int ch = getchar();
+
+    while (!isdigit(ch)) {
+        ch = getchar();
+    }
+
+    while (isdigit(ch)) {
+        result = ((result << 3) + (result << 1) + (ch ^ 48)); 
+        ch = getchar();
+    }
+
+    return result;
+}
+
+int num_nodes;
+int num_edges;
+int cost_gold;
+int cost_silver;
+
+// sorting on gold cost
+bool compare_gold(const Link& l1, const Link& l2) {
+    return (l1.gold_cost < l2.gold_cost);
+}
+
+//sorting on silver cost
+bool compare_silver(const Link& l1, const Link& l2) {
+    return (l1.silver_cost < l2.silver_cost);
+}
+
+long long min_cost = LLONG_MAX;
+
+int parent[210];
+Link links[51000];
+
+vector<Link> edge_data;
+
+// Initialize Union-Find data structure
+void initialize_union_find() {
+    for (int i = 0; i <= num_nodes; i++) {
+        parent[i] = i;
+    }
+}
+
+// Find the representative of a set
+int find_parent(int node) {
+    if(parent[node] == node) {
+        return node;
+    } else {
+        return parent[node] = find_parent(parent[node]);
+    }
+    // return parent[node] == node ? node : (parent[node] = find_parent(parent[node]));
+}
+
+
 int main() {
-    int numOfCities = 0, numOfRoads = 0;
-    cin >> numOfCities >> numOfRoads;
 
-    int goldCost = 0, silverCost = 0;
-    cin >> goldCost >> silverCost;
+    // Input the values for num_nodes, num_edges, cost_gold, cost_silver
+    num_nodes = read_input();
+    num_edges = read_input();
+    cost_gold = read_input();
+    cost_silver = read_input();
 
-    int goldMax = 0, silverMax = 0;
-
-    priority_queue<pair<int, int>,vector<pair<int, int>>, CompareSecond> v;
-    map<int, int> proccessedVertixs;
-    map<int, int> unproccessedVertixs;
-
-    for (int i = 1; i <= numOfCities; i++)
-    {
-        if(i == numOfCities) {
-
-            pair<int, int> vertixPair = pair<int, int>(i, 0);
-            v.push(vertixPair);
-            unproccessedVertixs[vertixPair.first] = vertixPair.second;
-            continue;
-        }
-        pair<int, int> vertixPair = pair<int, int>(i, 1000);
-        v.push(vertixPair);
-        unproccessedVertixs[vertixPair.first] = vertixPair.second;
+    //fill links with roads
+    for (int i = 0; i < num_edges; i++) {
+        links[i].node1 = read_input();
+        links[i].node2 = read_input();
+        links[i].gold_cost = read_input();
+        links[i].silver_cost = read_input();
     }
 
-    
-    pair<int, int> adj[numOfCities+1][numOfCities+1];
+    //sort by silver
+    sort(links, links + num_edges, compare_silver);
 
-    for (int i = 1; i <= numOfCities; i++)
-    {
-        for (int j = 1; j <= numOfCities; j++)
-        {
-            adj[i][j] = pair<int, int>(1000, 1000);
-        }
+    for (int i = 0; i < num_edges; i++) {
+        edge_data.push_back(links[i]);
+
+        //sort by gold
+        sort(edge_data.begin(), edge_data.end(), compare_gold);
         
-    }
+        //start unionfind
+        initialize_union_find();
 
-    while (numOfRoads--)
-    {
-        int from = 0, to = 0;
-        cin >> from >> to;
+        int edge_count = 0;
+        int max_gold_cost = 0;
+        auto cycle_edge = edge_data.end();
 
-        int goldCoins = 0, silverCoins = 0;
-        cin >> goldCoins >> silverCoins;
+        //MSt with Kruskal
+        for (auto link = edge_data.begin(); link != edge_data.end(); link++) {
+            int parent1 = find_parent(link->node1);
+            int parent2 = find_parent(link->node2);
 
-        if(from == to) {
-            continue;
-        }
+            if (parent1 != parent2) {
+                parent[parent1] = parent2; 
+                edge_count++;
+                max_gold_cost = link->gold_cost;
+            }
 
-        pair<int, int> newRoad = pair<int, int>(goldCoins*goldCost, silverCoins*silverCost);
-
-        if((adj[from][to].first + adj[from][to].second) > newRoad.first + newRoad.second) {
-            adj[from][to] = newRoad;
-            adj[to][from] = newRoad;
-        }
-    }
-
-    while(!v.empty()) {
-        pair<int, int> minVertix = v.top();
-        v.pop();
-
-        int sourceCity = minVertix.first;
-
-        for (int j = 1; j <= numOfCities; j++) {
-            // cout << "\n";
-            if((proccessedVertixs.find(j) == proccessedVertixs.end())/* || proccessedVertixs.find(sourceCity) == proccessedVertixs.end()*/) { // destination vertix in adj not proccessed yet
-
-                // cout << sourceCity << " " << j << endl;
-                // cout << adj[sourceCity][j].first << " " << adj[sourceCity][j].second << endl;
-
-                // cout << adj[sourceCity][j].first + adj[sourceCity][j].second << " " <<  unproccessedVertixs[j] << endl;
-                // cout << adj[sourceCity][j].first + adj[sourceCity][j].second << " " <<  unproccessedVertixs[sourceCity] << endl;
-
-                // cout << goldMax << " " << silverMax << endl;
-
-
-                if((adj[sourceCity][j].first != 1000) && (adj[sourceCity][j].second != 1000)
-                    && (adj[sourceCity][j].first + adj[sourceCity][j].second < unproccessedVertixs[j] || adj[sourceCity][j].first + adj[sourceCity][j].second < unproccessedVertixs[sourceCity])) {
-
-                    if(adj[sourceCity][j].first > goldMax) {
-                        goldMax = adj[sourceCity][j].first;
-                    }
-
-                    if(adj[sourceCity][j].second > silverMax) {
-                        silverMax = adj[sourceCity][j].second;
-                    }
-
-
-                    // cout << "condition hit" << endl;
-                    if(adj[sourceCity][j].first + adj[sourceCity][j].second < unproccessedVertixs[j]) {
-                        unproccessedVertixs[j] = adj[sourceCity][j].first + adj[sourceCity][j].second;
-
-                    } else if (adj[sourceCity][j].first + adj[sourceCity][j].second < unproccessedVertixs[sourceCity]) {
-                        unproccessedVertixs[sourceCity] = adj[sourceCity][j].first + adj[sourceCity][j].second;
-
-                    }
-
-                }
-                    // cout << "added " << minVertix.first << " to proccessed" << endl;
-                    proccessedVertixs[minVertix.first] = 1;
-                
+            else {
+                cycle_edge = link;
             }
         }
-        
-    }
 
-    for(auto pair : unproccessedVertixs) {
-        if (pair.second == 1000) {
-            cout << -1 << endl;
-            return 0;
+        //found a cycle remove it
+        if (cycle_edge != edge_data.end()) {
+            edge_data.erase(cycle_edge);
         }
 
-        // cout << pair.first << " " << pair.second << endl;
-        
+        // update minimums with new min road
+        if (edge_count == num_nodes - 1) {
+            min_cost = min(min_cost, links[i].silver_cost * (long long)cost_silver + max_gold_cost * (long long)cost_gold);
+        }
     }
-    
-    // for (int i = 1; i <= numOfCities; i++)
-    // {
-    //     for (int j = 1; j <= numOfCities; j++)
-    //     {
-    //         // adj[i][j] = pair<int, int>(1000, 1000);
 
-    //         cout << adj[i][j].first << "/" << adj[i][j].second << " ";
-    //     }
-
-    //     cout << endl;
-        
-    // }
-
-    // while (!v.empty()) {
-
-    //     pair<int, int> showPair = v.top();
-    //     v.pop();
-
-    //     cout << showPair.first << " " << showPair.second << endl;
-        
-    // }
-
-    cout << goldMax + silverMax << endl;
+    //output
+    if (min_cost == LLONG_MAX) {
+        cout << -1 << endl;
+    } else {
+        cout << min_cost << endl;
+    }
 
 }
